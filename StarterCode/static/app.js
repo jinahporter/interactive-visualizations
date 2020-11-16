@@ -20,7 +20,7 @@ function getMetadata(outcome) {
     })
 };
 
-function BubbleCharts() {
+function BubbleCharts(outcome1) {
 
     d3.json("samples.json").then((importedData) => {
 
@@ -29,42 +29,84 @@ function BubbleCharts() {
 
         console.log(data[0]);
 
-        var otu_ids = data[0];
-        //var otu_labels = data.map(row => row.otu_labels[0]);
-        //var sample_values = data.map(row => row.sample_values[0]);
+        var filteredID = data.filter(row => row.id == outcome1);
 
-        console.log(otu_ids.otu_ids);
-        console.log(otu_ids.otu_labels);
-        console.log(otu_ids.sample_values);
+        var otu_IDs = filteredID[0].otu_ids;
+        var otu_Labels = filteredID[0].otu_labels;
+        var sample_Values = filteredID[0].sample_values;
 
-        //create bubble chart
-        var bubble = {
-            x: otu_ids,
-            y: sample_values,
-            text: otu_labels,
-            mode: "markers",
-            marker: {
-                size: sample_values,
-                color: otu_ids
-            }
+        console.log(otu_IDs);
+        console.log(otu_Labels);
+        console.log(sample_Values);
+
+        //top 10 values
+        var values_sliced = sample_Values.slice(0, 10).reverse();
+
+        console.log(values_sliced);
+
+        var otu_IDs_sliced = otu_IDs.slice(0, 10).map(row => `otu_${row}`).reverse();
+        console.log(otu_IDs_sliced);
+
+        var otu_Labels_sliced = otu_Labels.slice(0, 10).reverse();
+        console.log(otu_Labels_sliced);
+
+        //create bar chart (top10)
+        var bars = {
+            x: values_sliced,
+            //error
+            y: otu_IDs_sliced,
+            text: otu_Labels_sliced,
+            type: "bar",
+            orientation: "h",
+            color: "green"
         };
 
         var layout1 = {
+            title: "Top 10 OTU",
+            margin: {
+                l: 120,
+                r: 120,
+                t: 120,
+                b: 45
+            }, 
+            yaxis: {
+                tickmode: "linear"
+            }
+        };
+
+        var data1 = [bars];
+
+        Plotly.newPlot("bar", data1, layout1);
+
+
+        //create bubble chart
+        var bubble = {
+            x: otu_IDs,
+            y: sample_Values,
+            text: otu_Labels,
+            mode: "markers",
+            marker: {
+                size: sample_Values,
+                color: otu_IDs
+            }
+        };
+
+        var layout2 = {
             xaxis: {
                 title: "OTU_IDs"
             },
-            margin: { 
-                t: 0 
+            margin: {
+                t: 0
             },
-            margin: { 
-                t: 30 
+            margin: {
+                t: 30
             },
             hovermode: "closests"
         };
 
-        var data1 = [bubble];
+        var data2 = [bubble];
 
-        Plotly.newPlot("bubble", data1, layout1);
+        Plotly.newPlot("bubble", data2, layout2);
     });
 }
 
@@ -91,12 +133,12 @@ function pullIDs() {
 
 function optionChanged(newID) {
     getMetadata(newID);
-    
+
     //pass my graphs function
     BubbleCharts(newID);
 
 
-    
+
 }
 
 pullIDs();
