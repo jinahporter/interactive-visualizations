@@ -4,7 +4,7 @@ function getMetadata(outcome) {
         //console.log(importedData);
         var data = importedData.metadata;
 
-        console.log(data);
+        //console.log(data);
 
         var getIDs = data.filter(row => row.id == outcome);
 
@@ -27,7 +27,7 @@ function BubbleCharts(outcome1) {
         //name to call otu_ids, otu_labels, sample_values
         var data = importedData.samples;
 
-        console.log(data[0]);
+        //console.log(data[0]);
 
         var filteredID = data.filter(row => row.id == outcome1);
 
@@ -35,20 +35,20 @@ function BubbleCharts(outcome1) {
         var otu_Labels = filteredID[0].otu_labels;
         var sample_Values = filteredID[0].sample_values;
 
-        console.log(otu_IDs);
-        console.log(otu_Labels);
-        console.log(sample_Values);
+        //console.log(otu_IDs);
+        //console.log(otu_Labels);
+        //console.log(sample_Values);
 
         //top 10 values
         var values_sliced = sample_Values.slice(0, 10).reverse();
 
-        console.log(values_sliced);
+        //console.log(values_sliced);
 
         var otu_IDs_sliced = otu_IDs.slice(0, 10).map(row => `otu_${row}`).reverse();
-        console.log(otu_IDs_sliced);
+        //console.log(otu_IDs_sliced);
 
         var otu_Labels_sliced = otu_Labels.slice(0, 10).reverse();
-        console.log(otu_Labels_sliced);
+        //console.log(otu_Labels_sliced);
 
         //create bar chart (top10)
         var bars = {
@@ -110,6 +110,53 @@ function BubbleCharts(outcome1) {
     });
 }
 
+function optional (outcome2) {
+    d3.json("samples.json").then((importedData) => {
+        
+        var data = importedData.metadata;
+
+        //console.log(data);
+
+        var getIDs = data.filter(row => row.id == outcome2);
+
+        //var arr = getIDs[0];
+        //console.log(arr);
+
+        var washing_freq = getIDs[0].wfreq;
+        console.log(washing_freq);
+
+        var data  = [
+            {
+                domain: { x: [0, 1], y: [0, 1] },
+                value: washing_freq,
+                title: { text: "Speed" },
+                type: "indicator",
+                mode: "gauge+number",
+                delta: { reference: 380},
+                gauge: {
+                    axis: {range: [null, 9] },
+                    steps: [
+                        {range: [0, 1], color: "white"},
+                        {range: [1, 2], color: "beige"},
+                        {range: [2, 3], color: "#eeeeee"},
+                        {range: [3, 4], color: "#dddddd"},
+                        {range: [4, 5], color: "#cee5c4"},
+                        {range: [5, 6], color: "#a6cd96"},
+                        {range: [6, 7], color: "#7bac66"},
+                        {range: [7, 8], color: "#599042"},
+                        {range: [8, 9], color: "#3e7526"}
+                    ]
+                }
+            }
+        ];
+        
+        var layout = { width: 600, height: 500, margin: { t: 0, b: 0 } };
+
+        Plotly.newPlot('gauge', data, layout);
+    })
+
+}
+
 function pullIDs() {
     d3.json("samples.json").then((importedData) => {
 
@@ -125,6 +172,7 @@ function pullIDs() {
 
         //pass my graphs function (getNames1)
         BubbleCharts(getNames1);
+        optional(getNames1);
 
     });
 };
@@ -136,6 +184,7 @@ function optionChanged(newID) {
 
     //pass my graphs function
     BubbleCharts(newID);
+    optional(newID);
 
 
 
